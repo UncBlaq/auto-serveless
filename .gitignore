@@ -1,0 +1,6 @@
+node_modules
+.serverless
+notee.md
+/undefined
+.env*
+reference/policy.json
