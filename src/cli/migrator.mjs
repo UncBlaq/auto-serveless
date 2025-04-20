@@ -3,7 +3,6 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import {Pool, neonConfig} from '@neondatabase/serverless'
 dotenv.config();
-import ws from 'ws';
 import {drizzle} from 'drizzle-orm/neon-serverless'
 import * as schema from '../db/schemas.mjs';
 import { getDbUrl } from '../lib/secrets.mjs'; 

@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-async function validatLeeds(payload) {
+const validateLeeds = async function validatLeeds(payload) {
     const schema = z.object({
         email: z.string().email(),
     }).strict();
@@ -11,3 +11,5 @@ async function validatLeeds(payload) {
         return { data: null, error: result.error, message: "Invalid payload" };
     }
 }
+
+export { validateLeeds };

@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "start": "node index.js",
-    "dev": "sls offline --stage dev",
+    "dev": "sls offline --stage dev --region us-east-2",
     "build": "tsc",
     "deploy": "sls deploy --stage prod --region us-east-2",
     "remove": "sls remove --stage prod",
