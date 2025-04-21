@@ -1,5 +1,4 @@
 name: Deploy Dev Stage
-
 on:
   push:
     branches: [ dev ]
