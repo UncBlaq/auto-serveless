@@ -24,17 +24,6 @@ provider:
         - ssm:PutParameter
       Resource: arn:aws:ssm:us-east-2:822875511636:parameter//serverless-framework/deployment/database-url
 
-
-  # iamRoleStatements:
-  #   - Effect: 'Allow'
-  #     Action:
-  #       - ssm:GetParameter
-  #       - ssm:GetParameters
-  #       - ssm:GetParametersByPath
-  #       - ssm:GetParameterHistory
-  #       - ssm:DescribeParameters
-  #     Resource: arn:aws:ssm:us-east-2:*:parameter/serverless/framework2/prod/database-url
-
 functions:
   api:
     handler: src/handler.handler
