@@ -7,6 +7,8 @@
     "dev": "sls offline --stage dev --region us-east-2",
     "build": "tsc",
     "deploy": "sls deploy --stage prod --region us-east-2",
+    "deploy-dev-stage": "sls deploy --stage dev --region us-east-2",
+    "info-dev-stage": "sls deploy --stage info --region us-east-2",
     "remove": "sls remove --stage prod",
     "generate": "cross-env drizzle-kit generate --config=src/migrations/drizzle.config.mjs",
     "migrate": "cross-env AWS_REGION=us-east-2 tsx src/cli/migrator.mjs",
