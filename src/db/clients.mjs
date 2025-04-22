@@ -2,12 +2,7 @@ import { neon, neonConfig } from '@neondatabase/serverless';
 import {getDbUrl} from  '../lib/secrets.mjs';
 import { drizzle } from 'drizzle-orm/neon-http';
 
-// async function dbClient() {
-//     const dbUrl = await getDbUrl();
-//     neonConfig.fetchConnectionCache = true;
-//     const sql = neon(dbUrl);
-//     return sql;
-// }
+neonConfig.fetchConnectionCache = true;
 
 let cachedSql = null;
 
@@ -26,11 +21,16 @@ const dbClient = async function dbClient() {
     cachedSql = neon(dbUrl);
     return cachedSql;
   }
-  
 
 async function getDbClientDrizzle() {
-    const dbUrl = await getDbUrl();
-    return drizzle(dbUrl); 
+  const dbUrl = await getDbUrl();
+  if (!dbUrl) {
+    throw new Error('Missing DB URL');
+  }
+  const sql = neon(dbUrl);     // ✅ This turns the string into a working client
+  const db = drizzle(sql); 
+  return db 
 }
+
 
 export { dbClient, getDbClientDrizzle };
