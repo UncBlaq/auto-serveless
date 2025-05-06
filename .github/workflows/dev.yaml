@@ -12,6 +12,9 @@ on:
 jobs:
   hello:
     runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-dev-stage
+      cancel-in-progress: true
     steps:
       - uses: actions/setup-node@v4
       - name: hello here1
