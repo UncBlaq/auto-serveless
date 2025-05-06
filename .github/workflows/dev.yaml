@@ -72,8 +72,19 @@ jobs:
         npm run deploy-dev-stage
     - name: Dev Stage Pull Request
       run: |
-        export PR_BRANCH=$(git branch --show-current)
-        export DEFAULT_BRANCH=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
-        echo "$PR_BRANCH and $DEFAULT_BRANCH"
-        export DEV_STAGE_INFO=$(npm run info-dev-stage)
-        gh pr create --title "Automated PR from Dev Stage" --body "$DEV_STAGE_INFO" --base $DEFAULT_BRANCH --head $PR_BRANCH --repo $GITHUB_REPOSITORY
+        # Check if PR already exists
+        export PR_EXISTS=$(gh pr list --state open --head dev --base main --repo $GITHUB_REPOSITORY --json number -q '.[].number')
+
+        if [ -z "$PR_EXISTS" ]; then
+          # No existing PR, create a new one
+          echo "No existing PR found. Creating new PR..."
+          export PR_BRANCH=$(git branch --show-current)
+          export DEFAULT_BRANCH=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
+          echo "$PR_BRANCH and $DEFAULT_BRANCH"
+          export DEV_STAGE_INFO=$(npm run info-dev-stage)
+          gh pr create --title "Automated PR from Dev Stage" --body "$DEV_STAGE_INFO" --base $DEFAULT_BRANCH --head $PR_BRANCH --repo $GITHUB_REPOSITORY
+        else
+          # PR already exists
+          echo "PR already exists: https://github.com/$GITHUB_REPOSITORY/pull/$PR_EXISTS"
+        fi
+
