@@ -1,0 +1,47 @@
+name: Create a comment on new issues
+
+on:
+  issues:
+    types: [opened]
+jobs:
+  comment-with-action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: "Dump GitHub context"
+        run: echo '${{ toJson(github.event) }}' | jq
+        shell: bash
+  
+      - name: Wait for issue to be available
+        run: sleep 5
+
+      - name: Create comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          repository: ${{ github.repository }}
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            This is a multi-line test comment
+            - With GitHub **Markdown** :sparkles:
+            - Created by [create-or-update-comment][1]
+
+            [1]: https://github.com/peter-evans/create-or-update-comment
+          reactions: '+1'
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+  comment-with-api:
+    runs-on: ubuntu-latest
+    needs: comment-with-action
+    steps:
+      - name: Create comment with API
+        env:
+          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          ORGANIZATION: ${{ github.event.organisation.ogin }}
+          REPOSITORY: ${{ github.event.repository.name }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          gh api -X POST \
+            https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments \
+            -f body="This is my test comment created with the GitHub API"

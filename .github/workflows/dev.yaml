@@ -1,6 +1,6 @@
 name: Deploy Dev Stage
 on:
-# event
+# event, made changes to dev, expects trigger
   push:
     branches: [ dev ]
   pull_request:
@@ -12,6 +12,9 @@ on:
 jobs:
   hello:
     runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-dev-stage
+      cancel-in-progress: true
     steps:
       - uses: actions/setup-node@v4
       - name: hello here1
@@ -32,6 +35,8 @@ jobs:
       NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
       STAGE: dev
       GH_TOKEN: ${{ github.token }} 
+      AWS_REGION: us-east-2
+      SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
     steps:
     - uses: actions/checkout@v4
       with:
@@ -48,23 +53,41 @@ jobs:
     - name: Delete Previous Branch
       run: neonctl branches delete dev --api-key ${{ env.API_KEY }}
       continue-on-error: true
-    - name: Debug env vars
+      # Delete existing dev branch if exist
+    - name: Delete Previous Branch
       run: |
-        echo "Project ID: ${{ env.NEON_PROJECT_ID }}"
-        echo "API Key length: ${#API_KEY}"
+        echo "Trying to delete existing branch..."
+        neonctl branches delete dev --project-id "$NEON_PROJECT_ID" --api-key "$API_KEY"
+      continue-on-error: true  # Avoid failure if branch doesn't exist
+# Create new branch dev for pure state
     - name: Create Branched Database 
-      run: neonctl branches create --name dev --project-id ${{ env.NEON_PROJECT_ID }} --api-key ${{ env.API_KEY }}
+      run: |
+        echo "Creating dev branch for project $NEON_PROJECT_ID"
+        neonctl branches create --name dev --project-id "$NEON_PROJECT_ID" --api-key "$API_KEY"
+
     - name: Branch Connection String in Parameter Store
       run: |
-        export DB_URL=$(neonctl connection-string --branch dev --api-key ${{ env.API_KEY }})
-        npx tsx src/cli/putSecrets.js dev $DB_URL
+        echo "Getting DB URL from dev branch..."
+        export DB_URL=$(neonctl connection-string --branch dev --project-id "$NEON_PROJECT_ID" --api-key "$API_KEY")
+        npx tsx src/cli/putSecrets.mjs dev $DB_URL
     - name: Deploy dev stage
       run: |
         npm run deploy-dev-stage
     - name: Dev Stage Pull Request
       run: |
-        export PR_BRANCH=$(git branch --show-current)
-        export DEFAULT_BRANCH=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
-        echo "$PR_BRANCH and $DEFAULT_BRANCH"
-        export DEV_STAGE_INFO=$(npm run info-dev-stage)
-        gh pr create --title "Automated PR from Dev Stage" --body "$DEV_STAGE_INFO" --base $DEFAULT_BRANCH --head $PR_BRANCH --repo $GITHUB_REPOSITORY
+        # Check if PR already exists
+        export PR_EXISTS=$(gh pr list --state open --head dev --base main --repo $GITHUB_REPOSITORY --json number -q '.[].number')
+
+        if [ -z "$PR_EXISTS" ]; then
+          # No existing PR, create a new one
+          echo "No existing PR found. Creating new PR..."
+          export PR_BRANCH=$(git branch --show-current)
+          export DEFAULT_BRANCH=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
+          echo "$PR_BRANCH and $DEFAULT_BRANCH"
+          export DEV_STAGE_INFO=$(npm run info-dev-stage)
+          gh pr create --title "Automated PR from Dev Stage" --body "$DEV_STAGE_INFO" --base $DEFAULT_BRANCH --head $PR_BRANCH --repo $GITHUB_REPOSITORY
+        else
+          # PR already exists
+          echo "PR already exists: https://github.com/$GITHUB_REPOSITORY/pull/$PR_EXISTS"
+        fi
+
