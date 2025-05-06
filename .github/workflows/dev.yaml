@@ -1,18 +1,37 @@
 name: Deploy Dev Stage
 on:
+# event
   push:
     branches: [ dev ]
+  pull_request:
+    braches:
+      - dev
+  # event button
   workflow_dispatch:
 
 jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+      - name: hello here1
+        run: echo 'Hello World'
+        shell: bash
+  goodbye:
+    runs-on: ubuntu-latest
+    steps:
+      - name: goodbye world
+        run: echo 'goodbye world'
+        shell: bash
   build:
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       API_KEY: ${{ secrets.NEON_API_KEY }}
+      NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
       STAGE: dev
-      GH_TOKEN: ${{ github.token }} # github cli -> gh
+      GH_TOKEN: ${{ github.token }} 
     steps:
     - uses: actions/checkout@v4
       with:
@@ -30,7 +49,7 @@ jobs:
       run: neonctl branches delete dev --api-key ${{ env.API_KEY }}
       continue-on-error: true
     - name: Create Branched Database 
-      run: neonctl branches create --name dev --api-key ${{ env.API_KEY }}
+      run: neonctl branches create --name dev --project-id NEON_PROJECT_ID --api-key ${{ env.API_KEY }}
     - name: Branch Connection String in Parameter Store
       run: |
         export DB_URL=$(neonctl connection-string --branch dev --api-key ${{ env.API_KEY }})

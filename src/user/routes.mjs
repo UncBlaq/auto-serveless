@@ -58,4 +58,10 @@ userRouter.post(
   );
 
 
+  // userRouter.post(
+  //   "/api/users/login",
+  //   validateWithZod(loginUserSchema),
+  //   loginUser
+  // )
+
 export default userRouter;
