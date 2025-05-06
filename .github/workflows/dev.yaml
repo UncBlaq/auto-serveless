@@ -29,6 +29,7 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       API_KEY: ${{ secrets.NEON_API_KEY }}
+      NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
       STAGE: dev
       GH_TOKEN: ${{ github.token }} # github cli -> gh
     steps:
@@ -48,7 +49,7 @@ jobs:
       run: neonctl branches delete dev --api-key ${{ env.API_KEY }}
       continue-on-error: true
     - name: Create Branched Database 
-      run: neonctl branches create --name dev --api-key ${{ env.API_KEY }}
+      run: neonctl branches create --name dev --project-id NEON_PROJECT_ID --api-key ${{ env.API_KEY }}
     - name: Branch Connection String in Parameter Store
       run: |
         export DB_URL=$(neonctl connection-string --branch dev --api-key ${{ env.API_KEY }})
