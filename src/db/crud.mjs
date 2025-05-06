@@ -1,5 +1,5 @@
 import { getDbClientDrizzle } from "./clients.mjs";
-import { leads } from "./schemas.mjs";
+import { leads, users } from "./schemas.mjs";
 async function addNewLead(email) {
     const db = await getDbClientDrizzle();
     const result = await db.insert(leads).values({ email }).returning({ id : leads.id });
@@ -8,6 +8,24 @@ async function addNewLead(email) {
     } else {
         throw new Error("Failed to create lead");
     }  
+}
+
+async function signUpUser(req) {
+    try {
+        const db = await getDbClientDrizzle();
+        const [user] = await db
+          .insert(users)
+          .values({
+            email: req.body.email,
+            password: req.body.password,
+          })
+          .returning();
+    
+        return user
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Failed to create user" });
+      }
 }
 
 async function getLeads() {
@@ -26,4 +44,4 @@ async function getLeadById(id) {
     }
 }
 
-export { addNewLead, getLeads, getLeadById };
+export { addNewLead, getLeads, getLeadById, signUpUser };

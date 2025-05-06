@@ -9,8 +9,13 @@ useDotenv: true
 provider:
   name: aws
   runtime: nodejs22.x
+  timeout: 15
   stage: dev
   region: us-east-2
+  httpApi: 
+    payload: '2.0'
+
+
   environment:
     STAGE: ${env:STAGE, 'prod'}
   iamRoleStatements:
@@ -24,8 +29,10 @@ provider:
         - ssm:PutParameter
       Resource: arn:aws:ssm:us-east-2:822875511636:parameter//serverless-framework/deployment/database-url
 
+
 functions:
   api:
+    timeout: 15
     handler: src/handler.handler
     events:
       - httpApi: "*"
@@ -37,9 +44,10 @@ custom:
       - AWS_SECRET_ACCESS_KEY
       - AWS_REGION
       - DATABASE_URL
-  serverless-offline:
-    httpPort: 4000   # Change to any port you want
 
+  serverless-offline:
+    httpPort: 4000
+    noPrependStageInUrl: true
 
 plugins:
   - serverless-offline

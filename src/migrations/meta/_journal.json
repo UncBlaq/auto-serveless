@@ -8,6 +8,20 @@
       "when": 1745073576895,
       "tag": "0000_superb_arclight",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1745251558286,
+      "tag": "0001_charming_synch",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1745251958317,
+      "tag": "0002_useful_masque",
+      "breakpoints": true
     }
   ]
 }
