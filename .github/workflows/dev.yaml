@@ -1,6 +1,6 @@
 name: Deploy Dev Stage
 on:
-# event
+# event, made changes to dev, expects trigger
   push:
     branches: [ dev ]
   pull_request:
