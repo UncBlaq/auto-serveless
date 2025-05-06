@@ -2,6 +2,8 @@ import serverless from "serverless-http";
 import express from "express";
 import { createClient } from "redis";
 import cors from 'cors'
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 
 import { addNewLead, getLeads } from "./db/crud.mjs";
@@ -10,8 +12,6 @@ import { userRouter } from './user/routes.mjs'
 import { dbClient } from "./db/clients.mjs";
 import { swaggerUi, swaggerSpec } from './swagger.mjs';
 
-import path from 'path';
-import { fileURLToPath } from 'url';
 
 // Required to make __dirname work in ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -25,7 +25,6 @@ const app = express();
 
 
 app.use('/api-docs', swaggerUi.serve);
-
 // app.get('/api-docs', swaggerUi.setup(swaggerSpec));
 
 // With this:
@@ -40,7 +39,6 @@ app.use('/user', userRouter);
 
 
 const redisClient = createClient();
-
 redisClient.on("error", (err) => console.error("Redis error:", err));
 
 const connectRedis = async () => {
@@ -50,13 +48,11 @@ const connectRedis = async () => {
 };
 
 
-
 const corsOptions = {
   origin: 'https://my-frontend-domain.com', // or use an array
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
-
 app.use(cors(corsOptions));
 
 // Middleware to catch invalid JSON syntax

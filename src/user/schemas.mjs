@@ -5,7 +5,6 @@ const userSchema = z.object({
     password: z.string()
   }).strict();
 
-
 const loginUserSchema = z.object({
     email: z
       .string({ required_error: "email must not be empty" })
@@ -18,7 +17,7 @@ const loginUserSchema = z.object({
       .min(1, "password must not be empty")
   }).strict();
 
-// Define a Zod schema for filtering response data
+// Defined a Zod schema for filtering response data
 const UserResponseSchema = z.object({
   id: z.string(),
   email: z.string(),

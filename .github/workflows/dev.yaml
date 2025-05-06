@@ -1,10 +1,28 @@
 name: Deploy Dev Stage
 on:
+# event
   push:
     branches: [ dev ]
+  pull_request:
+    braches:
+      - dev
+  # event button
   workflow_dispatch:
 
 jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+      - name: hello here1
+        run: echo 'Hello World'
+        shell: bash
+  goodbye:
+    runs-on: ubuntu-latest
+    steps:
+      - name: goodbye world
+        run: echo 'goodbye world'
+        shell: bash
   build:
     runs-on: ubuntu-latest
     env:
