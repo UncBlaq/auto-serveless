@@ -33,6 +33,7 @@ jobs:
       STAGE: dev
       GH_TOKEN: ${{ github.token }} 
       AWS_REGION: us-east-2
+      SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
     steps:
     - uses: actions/checkout@v4
       with:
