@@ -48,10 +48,18 @@ jobs:
     - name: Delete Previous Branch
       run: neonctl branches delete dev --api-key ${{ env.API_KEY }}
       continue-on-error: true
+      # Delete existing dev branch if exist
+    - name: Delete Previous Branch
+      run: |
+        echo "Trying to delete existing branch..."
+        neonctl branches delete dev --project-id "$NEON_PROJECT_ID" --api-key "$API_KEY"
+      continue-on-error: true  # Avoid failure if branch doesn't exist
+# Create new branch dev for pure state
     - name: Create Branched Database 
       run: |
-        echo "Using project: $NEON_PROJECT_ID"
+        echo "Creating dev branch for project $NEON_PROJECT_ID"
         neonctl branches create --name dev --project-id "$NEON_PROJECT_ID" --api-key "$API_KEY"
+
     - name: Branch Connection String in Parameter Store
       run: |
         export DB_URL=$(neonctl connection-string --branch dev --api-key ${{ env.API_KEY }})
